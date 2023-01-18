@@ -1,0 +1,57 @@
+/*Práctica de PROCEDIMIENTOS Y PARÁMETROS
+1- Crear un procedimiento llamado “visualizar” que visualice el nombre y 
+salario de todos los empleados.
+*/
+CREATE OR REPLACE PROCEDURE VISUALIZAR 
+IS
+    CURSOR EMPLEADOS IS SELECT * FROM EMPLOYEES;
+    EMPLEADO EMPLOYEES%ROWTYPE;
+BEGIN
+    FOR EMPLEADO IN EMPLEADOS LOOP
+        DBMS_OUTPUT.PUT_LINE(EMPLEADO.FIRST_NAME||' '||EMPLEADO.LAST_NAME||' '||EMPLEADO.SALARY);
+    END LOOP;
+END;
+/
+
+SET SERVEROUTPUT ON
+BEGIN
+    VISUALIZAR;
+END;
+/
+/*2- Modificar el programa anterior para incluir un parámetro que pase el 
+número de departamento para que visualice solo los empleados de ese 
+departamento
+• Debe devolver el número de empleados en una variable de tipo OUT*/
+CREATE OR REPLACE PROCEDURE VISUALIZAR (
+    ID_DEPARTAMENTO IN DEPARTMENTS.DEPARTMENT_ID%TYPE,
+    NUM_EMPLEADOS OUT NUMBER
+)
+IS
+    CURSOR EMPLEADOS(ID_DEPARTAMENTO DEPARTMENTS.DEPARTMENT_ID%TYPE) IS SELECT * FROM EMPLOYEES WHERE DEPARTMENT_ID = ID_DEPARTAMENTO;
+    EMPLEADO EMPLOYEES%ROWTYPE;
+    NUM_EMPL NUMBER:=0;
+BEGIN
+    FOR EMPLEADO IN EMPLEADOS(ID_DEPARTAMENTO) LOOP
+        DBMS_OUTPUT.PUT_LINE(EMPLEADO.FIRST_NAME||' '||EMPLEADO.LAST_NAME||' '||EMPLEADO.SALARY);
+        NUM_EMPL := NUM_EMPL + 1;
+    END LOOP;
+    NUM_EMPLEADOS := NUM_EMPL;
+END;
+/
+
+SET SERVEROUTPUT ON
+DECLARE
+    ID_DEPARTAMENTO NUMBER;
+    NUM_EMPLEADOS NUMBER;
+BEGIN
+    ID_DEPARTAMENTO := 60;
+    
+    VISUALIZAR(ID_DEPARTAMENTO, NUM_EMPLEADOS);
+    DBMS_OUTPUT.PUT_LINE(NUM_EMPLEADOS);
+END;
+/
+
+/*3- Crear un bloque por el cual se de formato a un número de cuenta 
+suministrado por completo, por ejmplo: 11111111111111111111
+• Formateado a: 1111-1111-11-1111111111
+• Debemos usar un parámetro de tipo IN-OUT*/
